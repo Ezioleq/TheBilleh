@@ -1,7 +1,8 @@
 import { Component } from "../component";
 
 export class SpriteRenderer implements Component {
-	name: string = "SpriteRenderer";
+	public readonly id: string = "SpriteRenderer";
+	public static readonly Name: string = "SpriteRenderer";
 
-	texture: HTMLImageElement;
+	public texture: HTMLImageElement;
 };

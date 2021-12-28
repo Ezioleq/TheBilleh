@@ -1,3 +1,3 @@
 export interface Component {
-	name: string;
+	readonly id: string;
 }
