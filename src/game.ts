@@ -3,8 +3,7 @@ import { Assets } from "./managers/assetManager";
 import { GameState } from "./states/gameState";
 import { Config } from "./config";
 import * as Stats from "stats.js";
-import { drawSystem } from "./ecs/systems/draw";
-import { physicsSystem } from "./ecs/systems/physics";
+import { physicsSystem, scriptSystem, drawSystem } from "./ecs/systems";
 import { Entity } from "./ecs/entity";
 
 export class Game {
@@ -88,6 +87,7 @@ export class Game {
 			// Update current state
 			Object.keys(Game.entities).forEach(id => {
 				physicsSystem(Game.entities[id]);
+				scriptSystem(Game.entities[id]);
 			});
 			GlobalState.current.update(this.ticks);
 			this.lagTime -= this.timePerTick;
@@ -106,7 +106,6 @@ export class Game {
 		Object.keys(Game.entities).forEach(id => {
 			drawSystem(Game.entities[id], step);
 		});
-		GlobalState.current.draw(Game.ctx, step);
 
 		// Request a new frame
 		window.requestAnimationFrame(this.mainLoop);

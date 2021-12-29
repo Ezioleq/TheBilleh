@@ -13,7 +13,9 @@ export class Entity {
 	}
 
 	public addComponent(component: Component) {
-		this.components[component.id] = component;
+		let c = component;
+		c.entity = this;
+		this.components[component.id] = c;
 		return this;
 	}
 

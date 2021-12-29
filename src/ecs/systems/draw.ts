@@ -1,14 +1,13 @@
 import { Entity } from "../entity";
 import { Game } from "../../game";
 import { Vector2 } from "../../math/vector";
-import { SpriteRenderer } from "../components/spriteRenderer";
-import { Transform } from "../components/transform";
+import { SpriteRenderer, Transform } from "../components";
 
 export let drawSystem = (entity: Entity, step: number) => {
 	let sr = entity.getComponent<SpriteRenderer>(SpriteRenderer.Name);
 	let t = entity.getComponent<Transform>(Transform.Name);
 
-	if (sr === undefined || t === undefined)
+	if (!sr.initialized || sr === undefined || t === undefined)
 		return;
 
 	let position: Vector2 = t.previousPosition.lerp(t.position, step);
