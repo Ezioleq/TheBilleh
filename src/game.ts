@@ -3,10 +3,14 @@ import { Assets } from "./managers/assetManager";
 import { GameState } from "./states/gameState";
 import { Config } from "./config";
 import * as Stats from "stats.js";
+import { drawSystem } from "./ecs/systems/draw";
+import { physicsSystem } from "./ecs/systems/physics";
+import { Entity } from "./ecs/entity";
 
 export class Game {
 	canvas: HTMLCanvasElement;
-	ctx: CanvasRenderingContext2D;
+	static ctx: CanvasRenderingContext2D;
+	static entities: { [id: string]: Entity } = {};
 	stats: Stats;
 
 	// Fixed timestep specific
@@ -20,7 +24,7 @@ export class Game {
 
 	constructor() {
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
-		this.ctx = this.canvas.getContext("2d", { alpha: false });
+		Game.ctx = this.canvas.getContext("2d", { alpha: false });
 
 		if (Config.isDebug) {
 			this.stats = new Stats();
@@ -82,6 +86,9 @@ export class Game {
 
 		while (this.lagTime >= this.timePerTick) {
 			// Update current state
+			Object.keys(Game.entities).forEach(id => {
+				physicsSystem(Game.entities[id]);
+			});
 			GlobalState.current.update(this.ticks);
 			this.lagTime -= this.timePerTick;
 			this.ticks++;
@@ -90,13 +97,16 @@ export class Game {
 
 	draw() {
 		// Clear the screen
-		this.ctx.fillStyle = "rgb(255, 255, 255)";
-		this.ctx.fillRect(0, 0, Config.gameWidth, Config.gameHeight);
-		this.ctx.fillStyle = "rgb(0, 0, 0)";
+		Game.ctx.fillStyle = "rgb(255, 255, 255)";
+		Game.ctx.fillRect(0, 0, Config.gameWidth, Config.gameHeight);
+		Game.ctx.fillStyle = "rgb(0, 0, 0)";
 
 		// Draw current state
 		let step = this.lagTime / this.timePerTick;
-		GlobalState.current.draw(this.ctx, step);
+		Object.keys(Game.entities).forEach(id => {
+			drawSystem(Game.entities[id], step);
+		});
+		GlobalState.current.draw(Game.ctx, step);
 
 		// Request a new frame
 		window.requestAnimationFrame(this.mainLoop);
